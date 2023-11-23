@@ -84,6 +84,8 @@ const useChatCustom = () => {
 			role: 'user'
 		});
 		sendMessage(inputMessage);
+		
+		console.log("sended mesage",inputMessage);
 	};
 
 	// Get one conversation

@@ -49,6 +49,7 @@ export default function Chat() {
 								<div className='absolute bottom-2 -right-10 xl:-right-20 z-10'>
 									<HelpButtonComponent />
 								</div>
+
 							</form>
 						</div>
 					</div>

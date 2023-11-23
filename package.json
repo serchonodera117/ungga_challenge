@@ -27,6 +27,7 @@
 		"framer-motion": "^10.16.4",
 		"immer": "^10.0.3",
 		"mongodb": "^6.3.0",
+		"mysql": "^2.18.1",
 		"nanoid": "^4.0.2",
 		"next": "13.4.4-canary.11",
 		"openai-edge": "^1.1.0",
