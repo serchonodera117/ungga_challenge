@@ -34,6 +34,7 @@ const MessagesList = ({ messages }: { messages: Message[] }) => {
 		};
 		const parseItemMessage = parseItem?.message ?? { message: { content: item.content } };
 
+		
 		return (
 			item.role !== 'system' && (
 				<div className='w-full justify-center' key={`${item.id}-${nanoid()}`}>
@@ -84,6 +85,7 @@ const MessagesList = ({ messages }: { messages: Message[] }) => {
 									</Accordion>
 								) : (
 									/* USER MESSAGE */
+									
 									<div
 										className='flex-1 md:max-w-[80%]'
 										onMouseEnter={() => setShowIconInUserMessage(true)}

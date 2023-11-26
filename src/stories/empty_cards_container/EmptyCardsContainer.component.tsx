@@ -35,6 +35,7 @@ const EmptyCardsContainerComponent = ({ isNewChat }: Props) => {
 						</div>
 					</div>
 					<div className='mb-5 text-2xl font-semibold text-black dark:text-white'>
+						<Image src={'/loading.gif'} alt='gorilla' width={70} height={70} style={{marginLeft: "auto", marginRight: "auto"}}/>
 						{/* How can I help you today?
 						 */}
 						¿En qué te puedo ayudar?

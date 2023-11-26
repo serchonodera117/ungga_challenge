@@ -1,3 +1,4 @@
+"use client"
 // libraries
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useChat } from 'ai/react';
@@ -10,8 +11,15 @@ import useConversationsStore from '@/store/useConversationsStore';
 import { PROMPTS } from '../../utils/propts';
 import { nanoid } from 'nanoid';
 import { Message } from 'ai';
+import { Result } from 'postcss';
+import { Interface } from 'readline';
+import { json } from 'stream/consumers';
+
 
 const useChatCustom = () => {
+	// const db = require('app/api/chat/db')
+	// const query = require('app/api/chat/queries')
+
 	const params = useParams();
 	const [dateInput, setDateInput] = useState<Date | undefined>();
 	const userId = useRef(nanoid());
@@ -35,10 +43,28 @@ const useChatCustom = () => {
 	const [inputMessage, setInputMessage] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 
+	useEffect(() => {
+		getMessages(1)
+	},[])
+
 	const handleChangeMessage = (e: any) => {
 		setInputMessage(e.target.value);
 	};
 
+	async function getMessages(userId: Number){
+		const response: any = await axios.get(`http://localhost:3001/receive_messages/${userId}`)
+		const resp: any = await  response.data;
+
+		resp.map((message: any) =>{
+			setNewMessage({
+				content: message.message,
+				id: nanoid(),
+				role: (message.username == "gpt")? "assistant": "user"
+			});
+		})
+	}
+	
+																				//------------------------------------------- send to open ai api
 	const sendMessage = useCallback(async (newMessage: string) => {
 		setInputMessage('');
 
@@ -49,15 +75,31 @@ const useChatCustom = () => {
 			});
 
 			setNewMessage({
-				content: response.data,
+				content: "Gpt response ", //response.data,
 				id: nanoid(),
 				role: 'assistant'
 			});
+
+			localSave(
+				{
+					message: "Gpt response",
+					userId: 1,
+					username: 'gpt'
+				}
+			)
+			console.log("gpt engine response: ", response.data)
 		} catch (error) {
 			console.error(error);
 		}
 	}, []);
 
+																					//------------------------------------------- send to open ai api
+	async function localSave (data: object){
+		console.log(`sended message: ${JSON.stringify(data)}`)
+		const response: any = await axios.post('http://localhost:3001/send_message', data)
+		const resp: any = await  JSON.stringify(response);
+		// console.log("local save response: ",resp);
+	}
 	// Current chat input component name
 	const inputType = useMemo(
 		() =>
@@ -77,15 +119,21 @@ const useChatCustom = () => {
 	// Submit user message
 	const handleSubmitCustom = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		let id = nanoid();
 		if (!e) return;
 		setNewMessage({
 			content: inputMessage,
-			id: nanoid(),
+			id: id,
 			role: 'user'
 		});
-		sendMessage(inputMessage);
 		
-		console.log("sended mesage",inputMessage);
+		sendMessage(inputMessage); //------------------------------------ message insersion
+		
+		localSave({
+			message: inputMessage,
+			userId: 1,
+			username: 'user'
+		})
 	};
 
 	// Get one conversation
