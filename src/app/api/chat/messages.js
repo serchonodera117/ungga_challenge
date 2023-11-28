@@ -9,7 +9,7 @@ const db = mysql.createConnection({
 	host: 'localhost',
 	user: 'root',
 	password: '',
-	database: ''
+	database: 'challenge_db'
 })
 
 db.connect(err =>{

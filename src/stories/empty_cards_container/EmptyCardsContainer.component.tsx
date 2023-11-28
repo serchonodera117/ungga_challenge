@@ -2,12 +2,18 @@ import React from 'react';
 import DefaultOptionCardComponent from '../default_option_card/DefaultOptionCard.component';
 import ToggleComponent from '../toggle/Toggle.component';
 import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 interface Props {
 	isNewChat: boolean;
 }
 
 const EmptyCardsContainerComponent = ({ isNewChat }: Props) => {
+	const [isLoading, setIsLoading] = useState<boolean | true>();
+	useEffect(() => {
+		setIsLoading(true)
+  	setTimeout(() => {setIsLoading(false)}, 3000)
+	}, [])
 	return (
 		<div className='h-full w-full flex flex-col gap-3 lg:mx-auto lg:max-w-2xl xl:max-w-3xl px-2'>
 			<div className={`flex h-full w-full flex-col px-2 pb-2`}>
@@ -35,7 +41,7 @@ const EmptyCardsContainerComponent = ({ isNewChat }: Props) => {
 						</div>
 					</div>
 					<div className='mb-5 text-2xl font-semibold text-black dark:text-white'>
-						<Image src={'/loading.gif'} alt='gorilla' width={70} height={70} style={{marginLeft: "auto", marginRight: "auto"}}/>
+						{(isLoading)?<Image src={'/loading.gif'} alt='gorilla' width={70} height={70} style={{marginLeft: "auto", marginRight: "auto"}}/> : <div></div>}
 						{/* How can I help you today?
 						 */}
 						¿En qué te puedo ayudar?

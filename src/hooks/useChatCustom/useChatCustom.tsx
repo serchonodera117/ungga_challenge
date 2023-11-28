@@ -14,6 +14,7 @@ import { Message } from 'ai';
 import { Result } from 'postcss';
 import { Interface } from 'readline';
 import { json } from 'stream/consumers';
+import OpenAI from "openai";
 
 
 const useChatCustom = () => {
@@ -21,9 +22,11 @@ const useChatCustom = () => {
 	// const query = require('app/api/chat/queries')
 
 	const params = useParams();
+	const [openAIToken, setOpenAIToken] = useState <String | ''>();
 	const [dateInput, setDateInput] = useState<Date | undefined>();
 	const userId = useRef(nanoid());
 	const [listOfComponents, setListOfComponents] = useState<any[]>([]);
+	
 	const [
 		setNewMessage,
 		setNewMessageComponent,
@@ -45,11 +48,33 @@ const useChatCustom = () => {
 
 	useEffect(() => {
 		getMessages(1)
+		setOpenAIToken("")
+		setInputMessage('');
+		ask_or_set_openaiToken()
 	},[])
 
 	const handleChangeMessage = (e: any) => {
 		setInputMessage(e.target.value);
 	};
+	//----------------------------------------------------------- set or ask for open ai api token
+	function ask_or_set_openaiToken(){
+		let token: any = localStorage.getItem('openai_token');
+		if(token!==null && token.trim('')) {
+			setOpenAIToken(token.toString());
+		}
+		else{
+			let writedToken: any = prompt("paste here your open AI token to work with the assistant");
+			let message: string = (writedToken!=null && writedToken.trim(''))? "saved token" : "warning you have to set the openAI token, don't leave it blank"
+			let require_reload: boolean = (writedToken!=null && writedToken.trim(''))? false : true;
+			alert(message);
+			
+			if(require_reload){location.reload();}
+			else{
+				localStorage.setItem('openai_token', writedToken);
+				setOpenAIToken(writedToken);
+			}
+		}
+	}
 
 	async function getMessages(userId: Number){
 		const response: any = await axios.get(`http://localhost:3001/receive_messages/${userId}`)
@@ -67,38 +92,57 @@ const useChatCustom = () => {
 																				//------------------------------------------- send to open ai api
 	const sendMessage = useCallback(async (newMessage: string) => {
 		setInputMessage('');
-
 		try {
-			const response = await axios.post('/api/chat', {
-				message: newMessage,
-				userId: userId.current
-			});
+			let url: string = "https://api.openai.com/v1/chat/completions"
+			
+			let openAIOBJ: any = {
+				"model": "gpt-3.5-turbo",
+				"messages": [
+								{
+									 "role": "system",
+									 "content": "You are a helpful real estate assistant."
+								},
+								{
+									"role": "user",
+									"content": newMessage
+								}
+							],
+				}; 
 
-			setNewMessage({
-				content: "Gpt response ", //response.data,
+				const response = await axios.post(url, openAIOBJ, {
+					headers: {
+						"Content-Type":  "application/json",
+						 "Authorization": `Bearer ${openAIToken}`
+						}
+				});
+
+				const messageReceived: string = response.data.choices[0].message.content; 
+				console.log("Gpt response: ", messageReceived) 
+			
+				setNewMessage({
+				content: messageReceived, //response.data,
 				id: nanoid(),
 				role: 'assistant'
 			});
 
 			localSave(
 				{
-					message: "Gpt response",
+					message: messageReceived,
 					userId: 1,
 					username: 'gpt'
 				}
 			)
-			console.log("gpt engine response: ", response.data)
 		} catch (error) {
 			console.error(error);
 		}
 	}, []);
 
-																					//------------------------------------------- send to open ai api
+																					//-------------------------------------------------- send to my local api to save messages
 	async function localSave (data: object){
 		console.log(`sended message: ${JSON.stringify(data)}`)
 		const response: any = await axios.post('http://localhost:3001/send_message', data)
 		const resp: any = await  JSON.stringify(response);
-		// console.log("local save response: ",resp);
+		console.log("local saved token: ", openAIToken);
 	}
 	// Current chat input component name
 	const inputType = useMemo(

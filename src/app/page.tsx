@@ -19,7 +19,7 @@ export default function Chat() {
 	const messages = useMessagesStore((state) => state.messages);
 
 	return (
-		<HomeLayout style={{scrollToBottom: "true"}}>
+		<HomeLayout>
 			<div className='flex flex-col h-full justify-between w-full'>
 				{/* MESSAGES */}
 				<MessagesList messages={messages} />

@@ -32,6 +32,7 @@
 		"mysql": "^2.18.1",
 		"nanoid": "^4.0.2",
 		"next": "13.4.4-canary.11",
+		"openai": "^4.20.0",
 		"openai-edge": "^1.1.0",
 		"prop-types": "^15.8.1",
 		"rc-table": "^7.32.1",
